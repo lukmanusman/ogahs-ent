@@ -38,6 +38,8 @@ model User {
   role         UserRole
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+
+  vitals Vital[]
 }
 
 model Patient {
@@ -66,5 +68,24 @@ model Visit {
   updatedAt DateTime   @updatedAt
 
   patient Patient @relation(fields: [patientId], references: [id], onDelete: Restrict)
+  vitals  Vital[]
 }
 
+model Vital {
+  id                Int      @id @default(autoincrement())
+  visitId           Int
+  recordedById      Int
+  temperature       Float?
+  bloodPressure     String?
+  pulseRate         Int?
+  respiratoryRate   Int?
+  oxygenSaturation  Float?
+  weight            Float?
+  height            Float?
+  recordedAt        DateTime @default(now())
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  visit      Visit @relation(fields: [visitId], references: [id], onDelete: Restrict)
+  recordedBy User  @relation(fields: [recordedById], references: [id], onDelete: Restrict)
+}
