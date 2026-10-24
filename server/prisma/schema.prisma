@@ -29,6 +29,19 @@ enum VisitStatus {
   COMPLETED
 }
 
+enum PaymentMethod {
+  CASH
+  BANK_TRANSFER
+  POS
+}
+
+enum PaymentStatus {
+  PENDING
+  CONFIRMED
+  FAILED
+  CANCELLED
+}
+
 model User {
   id           Int      @id @default(autoincrement())
   firstName    String
@@ -40,6 +53,7 @@ model User {
   updatedAt    DateTime @updatedAt
 
   vitals Vital[]
+  payments Payment[]
 }
 
 model Patient {
@@ -69,6 +83,7 @@ model Visit {
 
   patient Patient @relation(fields: [patientId], references: [id], onDelete: Restrict)
   vitals  Vital[]
+  payment Payment?
 }
 
 model Vital {
@@ -88,4 +103,20 @@ model Vital {
 
   visit      Visit @relation(fields: [visitId], references: [id], onDelete: Restrict)
   recordedBy User  @relation(fields: [recordedById], references: [id], onDelete: Restrict)
+}
+
+model Payment {
+  id                  Int           @id @default(autoincrement())
+  visitId             Int           @unique
+  amount              Decimal       @db.Decimal(10, 2)
+  method              PaymentMethod
+  status              PaymentStatus @default(PENDING)
+  transactionReference String?
+  receivedById        Int
+  paidAt              DateTime?
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+
+  visit      Visit @relation(fields: [visitId], references: [id], onDelete: Restrict)
+  receivedBy User  @relation(fields: [receivedById], references: [id], onDelete: Restrict)
 }
